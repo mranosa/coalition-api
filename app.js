@@ -23,11 +23,11 @@ app.get('/', (req, res) => {
 
 app.post('/books', function(req, res){    
   new Book(req.body).save((err, book) => {
-  	if(err) {
-  		res.status(500).send({ message: err.message });	
-  	} else {
-  		res.status(201).json({data: book})	
-  	}
+    if(err) {
+      res.status(500).send({ message: err.message });	
+    } else {
+      res.status(201).json({data: book})	
+    }
   });
 });
 
