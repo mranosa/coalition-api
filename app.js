@@ -24,10 +24,28 @@ app.get('/', (req, res) => {
 app.post('/books', function(req, res){    
   new Book(req.body).save((err, book) => {
     if(err) {
-      res.status(500).send({ message: err.message });	
-    } else {
-      res.status(201).json({data: book})	
+      res.status(500).send({ message: err.message });
+      return;
     }
+    
+    res.status(201).json({data: book});
+  });
+});
+
+app.get('/books/:id', function(req, res){
+  // TODO Is it better to promisify this?
+  Book.findOne({_id: req.params.id}, (err, book) => {
+    if(!book) {
+      res.status(404).send({ message: 'Book not found!' }); 
+      return;
+    }
+
+    if(err) {
+      res.status(500).send({ message: err.message }); 
+      return;
+    }
+
+    res.status(200).json({data: book});
   });
 });
 

@@ -10,6 +10,12 @@ chai.use(chaiHttp);
 
 describe('Books API', function() {
   var server;
+  var createdBook;
+  var book = {
+      title: "title 1",
+      author: "author 1", 
+      price: 20
+    };
 
   before(function(done) {
     mongoose.connect(db_url, {useCreateIndex: true , useNewUrlParser: true, useUnifiedTopology: true});
@@ -42,15 +48,14 @@ describe('Books API', function() {
   it('should POST /books, valid request', function(done) {
     chai.request(app)
       .post('/books')
-      .send({
-        title: "title 1",
-        author: "author 1", 
-        price: 20
-      })
+      .send(book)
       .end((err, res) => {
         expect(res.status).to.equal(201);
-        expect(res.body.data.title).to.equal("title 1");
-      done();
+        expect(res.body.data.title).to.equal(book.title);
+
+        createdBook = res.body.data;
+
+        done();
     });
   });
 
@@ -66,8 +71,49 @@ describe('Books API', function() {
       });
   });
 
-  // TODO Get
-  // TODO Update
-  // TODO Delete
-  // TODO List
+  // get
+  it('should GET /books/:id, valid request', function(done) {
+    chai.request(app)
+      .get(`/books/${createdBook._id}`)
+      .end((err, res) => {
+        expect(res.status).to.equal(200);
+        expect(res.body.data.title).to.equal(book.title);
+      done();
+    });
+  });
+
+  it('should GET /books/:id, non existent request', function(done) {
+    var non_existent_id = 123412341234;
+    chai.request(app)
+      .get(`/books/${non_existent_id}`)
+      .end((err, res) => {
+        expect(res.status).to.equal(404);
+        done();
+      });
+  });
+
+  it('should GET /books/:id, empty request', function(done) {
+    chai.request(app)
+      .get(`/books/`)
+      .end((err, res) => {
+        expect(res.status).to.equal(404);
+        done();
+      });
+  });
+
+  it('should GET /books/:id, invalid request', function(done) {
+    chai.request(app)
+      .get(`/books/asdfasdf****asdfasdf___________asdf`)
+      .end((err, res) => {
+        expect(res.status).to.equal(404);
+        done();
+      });
+  });
+
+  // TODO add code coverage
+  // TODO add github actions
+
+  // TODO update
+  // TODO delete
+  // TODO list
 });
